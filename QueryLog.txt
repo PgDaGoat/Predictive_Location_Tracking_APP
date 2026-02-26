@@ -1,0 +1,62 @@
+Phase 1: Core Activity & Sensor Logic
+
+Prompt 1: Project Setup & UI Structure
+
+"Create an Android Activity named MainActivity that uses a RecyclerView to display sensor data. 
+Each row should show a label and a value using a custom itemData class and a layout called single_unit. 
+Include a method getInitData() to initialize the list with rows for 'Step Counter', 'Roll', 'Pitch', 'Yaw', and Linear Acceleration X, Y, and Z."
+
+Prompt 2: Sensor Implementation & Step Detection
+
+"Implement SensorEventListener. 
+Initialize SensorManager for Magnetic Field, Accelerometer, Linear Acceleration, and Gyroscope. 
+Create a step detection algorithm using a Low-Pass Filter (alpha=0.5) on Linear Acceleration magnitude with a dual-threshold state machine (Step On: 3.5, Step Off: 2.0). 
+Update the UI immediately via mUiHandler.post() when a step is detected."
+
+Prompt 3: Sensor Fusion & Refinement
+
+"Integrate the muse_plus library to extract Euler angles (Roll, Pitch, Yaw) from gyroscope updates. 
+Ensure UI elements for orientation and acceleration refresh every 500ms using a Handler and Runnable to prevent UI stuttering."
+
+Phase 2: Database Integration (JDBC & PostgreSQL)
+
+Prompt 4: JDBC Setup & Permissions
+
+"Integrate the provided jdbcDatabase.java file into the com.example.lab3 package. 
+Add the org.postgresql:postgresql:42.2.5 dependency to build.gradle. 
+Add INTERNET and ACCESS_NETWORK_STATE permissions to the Manifest.
+Ensure all database operations are wrapped in background threads to avoid NetworkOnMainThreadException."
+
+Prompt 5: Configuring On-Device Connection
+
+"The database is running locally on a Pixel 8 device via Termux. 
+Update jdbcDatabase.java to set the host to 127.0.0.1. 
+Create a method insertSensorData() to log steps, orientation, and acceleration into a table named sensor_data."
+
+Phase 3: Location & Spatial Query Development
+
+Prompt 6: GPS Implementation
+
+"Implement Task 4 and 5 from the lab manual. 
+Add ACCESS_FINE_LOCATION and ACCESS_COARSE_LOCATION permissions. 
+Implement LocationListener in MainActivity. 
+Request runtime permissions and use LocationManager to fetch GPS updates every 5 seconds. 
+Update the RecyclerView with current Latitude and Longitude."
+
+Prompt 7: PostGIS Spatial Query (Nearest Road)
+
+"Modify getNearestData() in jdbcDatabase.java to query the planet_osm_roads table from the imported Milwaukee dataset. 
+Use PostGIS functions ST_Distance and ST_Transform to convert GPS (4326) to Map projection (3857). 
+Use the <-> operator for an efficient GIST index search to find the closest road name and distance in meters."
+
+Phase 4: Debugging & Finalization
+
+Prompt 8: Troubleshooting Connection Errors
+
+"Logcat shows Connection refused. 
+Analyze potential causes including PostgreSQL listen_addresses configuration, the need to restart the server in Termux, and verifying the correct host IP for physical device testing."
+
+Prompt 9: Error Resolution: 'Relation Does Not Exist'
+
+"The query for 'Nearest Road' is failing with relation "sensor_data" does not exist. 
+Update the SQL logic to target the correct OpenStreetMap table (planet_osm_roads) instead of the custom logging table, ensuring the column names match the provided SQL dump schema."
